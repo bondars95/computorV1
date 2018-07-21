@@ -1,0 +1,43 @@
+
+ public class computor {
+	 
+
+	public static void main(String[] args) {
+		Polynome pol;
+		Pol_deg_2 pol2;
+		
+		if (args.length != 1) {
+			System.out.println("Wrong number of arguments :( ");
+			return ;
+		}
+		
+		try {
+			pol = new Polynome(args[0]);
+		} catch (Exception e) {
+			System.out.println("Une erreur est survenue lors du parsing." + System.lineSeparator() + "Veuillez vérifier le bon format de l'expression entrée. "
+					+ "Détails de l'erreur : " + e.toString() + ".");
+			System.out.println("Computor-V1 va à présent se terminer.");
+			return ;
+		}
+		pol.sort();
+		System.out.println("Reduced form: " + pol + " = 0");
+		System.out.println("Polynomial degree: " + Integer.toString(pol.getDegre()));
+		if (pol.getDegre() > 2)
+			System.out.println("The polynomial degree is stricly greater than 2, I can't solve.");
+		else if (pol.getDegre() == 2) {
+			pol2 = new Pol_deg_2(pol);
+			pol2.solve_and_print();
+		}
+		else if (pol.getDegre() == 1) {
+			System.out.println("The polynomial degree is equal to 1, here is the only solution :");
+			System.out.println((-1 * pol.get_monome_deg(0).getCoef()) / pol.get_monome_deg(1).getCoef());
+		}
+		else if (pol.getDegre() == 0) {
+			System.out.println("The equation you entered corresponds to: " + pol + " = 0");
+			if (pol.get_monome_deg(0).getCoef() == 0)
+				System.out.println("Every real number is a solution of this equation.");
+			else
+				System.out.println("There is no solution to this equation.");
+		}
+	}
+}
