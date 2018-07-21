@@ -1,7 +1,5 @@
 
- public class computor {
-	 
-
+ public class Computor {
 	public static void main(String[] args) {
 		Polynome pol;
 		Pol_deg_2 pol2;
@@ -14,9 +12,9 @@
 		try {
 			pol = new Polynome(args[0]);
 		} catch (Exception e) {
-			System.out.println("Une erreur est survenue lors du parsing." + System.lineSeparator() + "Veuillez vérifier le bon format de l'expression entrée. "
-					+ "Détails de l'erreur : " + e.toString() + ".");
-			System.out.println("Computor-V1 va à présent se terminer.");
+			System.out.println("Parsing error has occurred." + System.lineSeparator() + "Please check format. "
+					+ "Error details : " + e.toString() + ".");
+			System.out.println("Computor-V1 has exited unexpectly.");
 			return ;
 		}
 		pol.sort();

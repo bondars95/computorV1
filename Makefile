@@ -1,9 +1,9 @@
-SRC_NAME = computor.java \
+SRC_NAME = Computor.java \
 						Complex.java \
-						Monome.java \
-						Polynome.java \
+						PolDeg1.java \
+						PolDeg2.java \
 						ParseException.java \
-						Pol_deg_2.java
+						Polynome.java
 
 
 SRC_PATH = ./src/
