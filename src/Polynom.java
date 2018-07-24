@@ -3,9 +3,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Polynom {
-    private ArrayList<Exponent> exponents = new ArrayList<>();
+    private static ArrayList<Exponent> exponents = new ArrayList<>();
 
-    Polynom(String arg) {
+    private static void parseExpression(String exp, boolean leftPart) {
         int sign;
         double cof;
         double power;
@@ -13,46 +13,46 @@ public class Polynom {
         int len;
 
         i = 0;
-        while (i < arg.length()) {
-            while (arg.charAt(i) == ' ') {
+        while (i < exp.length()) {
+            while (exp.charAt(i) == ' ') {
                 i++;
             }
-            if (arg.charAt(i) == '-') {
+            if (exp.charAt(i) == '-') {
                 sign = -1;
                 i++;
             } else {
                 sign = 1;
-                if (arg.charAt(i) == '+') {
+                if (exp.charAt(i) == '+') {
                     i++;
                 }
             }
             len = 0;
-            while (arg.charAt(i) == ' ')
+            while (exp.charAt(i) == ' ')
                 i++;
-            while (Character.isDigit(arg.charAt(i + len)) || arg.charAt(i + len) == '.') {
+            while (Character.isDigit(exp.charAt(i + len)) || exp.charAt(i + len) == '.') {
                 len++;
             }
-            cof = Double.parseDouble(arg.substring(i, i + len)) * sign;
+            cof = Double.parseDouble(exp.substring(i, i + len)) * sign;
             i += len;
-            if (arg.charAt(i + 1) == '*') {
+            if (exp.charAt(i + 1) == '*') {
                 i += 4;
-                if (i > arg.length()) {
+                if (i > exp.length()) {
                     throw new ParseException("Unexpected end");
                 }
-                if (arg.charAt(i) != '^') {
+                if (exp.charAt(i) != '^') {
                     power = 1;
                 } else {
                     i++;
-                    if (arg.charAt(i) == '-') {
+                    if (exp.charAt(i) == '-') {
                         sign = -1;
                         i++;
                     } else
                         sign = 1;
                     len = 0;
-                    while (Character.isDigit(arg.charAt(i + len)) || arg.charAt(i + len) == '.') {
+                    while (i + len < exp.length() && (Character.isDigit(exp.charAt(i + len)) || exp.charAt(i + len) == '.')) {
                         len++;
                     }
-                    power = Double.parseDouble(arg.substring(i, i + len)) * sign;
+                    power = Double.parseDouble(exp.substring(i, i + len)) * sign;
                     i += len;
                 }
                 if (power % 1 != 0 || power < 0) {
@@ -61,88 +61,41 @@ public class Polynom {
             } else {
                 power = 0;
             }
-            addExponent(new Exponent((int) power, cof));
-            while (arg.charAt(i) == ' ')
+            addExponent(new Exponent((int) power, leftPart ? cof : -cof));
+            while (i + len < exp.length() && exp.charAt(i) == ' ') {
                 i++;
-            if (arg.charAt(i) == '=')
-                break;
+            }
+            if (leftPart && exp.charAt(i) == '=') {
+                // parse right part
+                parseExpression(exp.substring(i + 1), false);
+                return;
+            }
         }
-        i++;
-        while (i < arg.length()) {
-            while (arg.charAt(i) == ' ')
-                i++;
-            if (arg.charAt(i) == '-') {
-                sign = -1;
-                i++;
-            } else {
-                sign = 1;
-                if (arg.charAt(i) == '+')
-                    i++;
-            }
-            len = 0;
-            while (arg.charAt(i) == ' ')
-                i++;
-            while (Character.isDigit(arg.charAt(i + len)) || arg.charAt(i + len) == '.') {
-                len++;
-            }
-            cof = Double.parseDouble(arg.substring(i, i + len)) * sign;
-            i += len;
-            if (arg.charAt(i + 1) == '*') {
-                i += 4;
-                if (i > arg.length()) {
-                    throw new ParseException("Unexpected end");
-                }
-                if (arg.charAt(i) != '^') {
-                    power = 1;
-                } else {
-                    i++;
-                    if (arg.charAt(i) == '-') {
-                        sign = -1;
-                        i++;
-                    } else
-                        sign = 1;
-                    len = 0;
-                    while (i + len < arg.length() && (Character.isDigit(arg.charAt(i + len)) || arg.charAt(i + len) == '.')) {
-                        len++;
-                    }
-                    power = Double.parseDouble(arg.substring(i, i + len)) * sign;
-                    i += len;
-                }
-                if (power % 1 != 0 || power < 0) {
-                    throw new ParseException("It seems you gave a not natural power value (" + power + ")");
-                }
-            } else {
-                power = 0;
-            }
-            addExponent(new Exponent((int) power, cof * -1));
-            while (i + len < arg.length() && arg.charAt(i) == ' ')
-                i++;
-        }
-        if (exponents.isEmpty())
+    }
+
+    Polynom(String arg) {
+        parseExpression(arg, true);
+        if (exponents.isEmpty()) {
             exponents.add(new Exponent(0, 0));
+        }
     }
 
     void sort() {
         Collections.sort(exponents);
     }
 
-    private void addExponent(Exponent toAdd) {
-        Exponent i;
-        int n;
-
-        n = 0;
+    private static void addExponent(Exponent toAdd) {
         if (toAdd.getCof() == 0 && toAdd.getPower() != 0)
             return;
-        while (n < exponents.size()) {
-            i = exponents.get(n);
-            if (i.getPower() == toAdd.getPower()) {
-                if (i.getCof() + toAdd.getCof() == 0 && i.getPower() != 0)
-                    exponents.remove(n);
-                else
-                    i.add(toAdd);
+        for (Exponent e : exponents) {
+            if (e.getPower() == toAdd.getPower()) {
+                if ((e.getCof() + toAdd.getCof()) == 0 && e.getPower() != 0) {
+                    exponents.remove(e);
+                } else {
+                    e.add(toAdd);
+                }
                 return;
             }
-            n++;
         }
         exponents.add(toAdd);
     }
@@ -153,7 +106,7 @@ public class Polynom {
         int j;
         ArrayList<Exponent> exponents;
 
-        exponents = new ArrayList<>(this.exponents);
+        exponents = new ArrayList<>(Polynom.exponents);
         Collections.reverse(exponents);
         j = 0;
         for (Exponent i : exponents) {

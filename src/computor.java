@@ -2,7 +2,6 @@
 public class computor {
     public static void main(String[] args) {
         Polynom pol;
-        PolynomPow2 pol2;
 
         if (args.length != 1) {
             System.out.println("Wrong number of arguments :( ");
