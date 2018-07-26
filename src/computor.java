@@ -7,7 +7,10 @@ public class computor {
             System.out.println("Wrong number of arguments :( ");
             return;
         }
-
+        if (args[0].trim().isEmpty()) {
+            System.out.println("Empty string error");
+            return;
+        }
         try {
             pol = new Polynom(args[0]);
         } catch (Exception e) {
